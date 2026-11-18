@@ -4,12 +4,1113 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MANGO SAGO - PO Purwakarta</title>
+<!-- Library JsBarcode untuk membuat barcode unik pada struk -->
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<!-- Library Html5-QRCode untuk scan barcode via kamera atau upload foto struk di Admin -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
-  *{box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
-  body{margin:0;background:linear-gradient(180deg,#2ea6ff 0%,#7fd4ff 25%,#ffe98a 60%,#ffb347 100%);min-height:100vh;padding:12px;padding-bottom:36px}
-  .top{max-width:480px;margin:auto;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-  .poster{width:100%;display:block}
-  .hero{padding:14px 
+*{box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{margin:0;background:linear-gradient(180deg,#2ea6ff 0%,#7fd4ff 25%,#ffe98a 60%,#ffb347 100%);min-height:100vh;padding:12px;padding-bottom:30px}
+.top{max-width:480px;margin:auto;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.poster-wrap{width:100%;position:relative;background:linear-gradient(135deg,#ff9f1c 0%,#ffbf69 50%,#fff3b0 100%);overflow:hidden}
+.poster{width:100%;display:block}
+.hero{padding:14px 16px 4px;text-align:center}
+.hero h1{margin:0;font-size:32px;line-height:.9;color:#0b6cff;letter-spacing:1px;text-shadow:2px 2px 0 #ffe066}
+.hero h1 span{color:#ff8a00}
+.hero p{margin:6px 0;font-weight:700;color:#333}
+.badge-po{display:inline-block;background:#ff4757;color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800}
+.price-tag{display:inline-block;background:#fff3b0;border:2px dashed #ff8a00;padding:6px 14px;border-radius:12px;font-weight:900;color:#d63000;margin-top:8px}
+.card{background:#fff;margin:12px;border-radius:18px;padding:16px;box-shadow:0 4px 15px rgba(0,0,0,.08)}
+label{font-size:13px;font-weight:700;color:#444}
+input,select,textarea{width:100%;padding:12px;margin:6px 0 12px;border:1.5px solid #ffe08a;border-radius:12px;font-size:14px;background:#fffdf0;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#ff8a00;background:#fff}
+button{width:100%;padding:14px;border:none;border-radius:14px;font-weight:800;cursor:pointer;font-size:15px;transition:transform .1s,opacity .2s}
+button:active{transform:scale(.98)}
+.btn-order{background:linear-gradient(90deg,#ff9f1c,#ff6b00);color:#fff;box-shadow:0 4px 0 #c44e00}
+.btn-history{background:#fff3b0;color:#d63000;border:2px solid #ffb347;margin-top:10px}
+.btn-scan{background:linear-gradient(90deg,#00b894,#00997a);color:#fff;box-shadow:0 4px 0 #00735c;margin-bottom:12px}
+.btn-admin{background:#0b6cff;color:#fff;margin-top:10px;box-shadow:0 4px 0 #084db5}
+.btn-done{background:#00b894;color:#fff;padding:6px 10px;font-size:11px;border-radius:8px;width:auto}
+.btn-del{background:#ff4757;color:#fff;padding:6px 10px;font-size:11px;border-radius:8px;width:auto;margin-left:4px}
+.btn-back{background:#eee;color:#333;margin-top:10px}
+.btn-wa{display:block;text-align:center;text-decoration:none;background:#25D366;color:#fff;padding:14px;border-radius:14px;font-weight:800;font-size:15px;margin-top:10px;box-shadow:0 4px 0 #1da851;transition:transform .1s,opacity .2s}
+.btn-wa:active{transform:scale(.98)}
+.btn-copy{background:#fff3b0;color:#d63000;border:1.5px solid #ffb347;margin-top:10px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed #eee;font-size:14px}
+.total{font-size:18px;color:#e65100;font-weight:900}
+.badge{padding:4px 9px;border-radius:20px;font-size:11px;color:#fff;font-weight:700;display:inline-block}
+.pending{background:#f59e0b}
+.selesai{background:#00b894}
+.hidden{display:none !important}
+.center{text-align:center}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:8px 6px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
+.kec-info{font-size:12px;background:#e8f7ff;padding:10px;border-radius:10px;color:#0b6cff;margin-top:-6px;margin-bottom:10px;line-height:1.4}
+
+/* Notifikasi Toast Custom */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#2d3436;color:#fff;padding:12px 18px;border-radius:14px;font-size:13px;font-weight:700;z-index:10000;box-shadow:0 8px 20px rgba(0,0,0,.25);max-width:90%;text-align:center;animation:slideDown .25s ease}
+.toast.error{background:#ff4757}
+.toast.success{background:#00b894}
+@keyframes slideDown{from{opacity:0;transform:translate(-50%,-15px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* Styling Struk / Nota */
+.struk-box{background:#fffdf5;border:2px dashed #ffb347;border-radius:16px;padding:16px;margin-top:8px}
+.struk-header{text-align:center;border-bottom:1.5px dashed #ffd180;padding-bottom:10px;margin-bottom:10px}
+.struk-header h4{margin:0;color:#e65100;font-size:17px}
+.struk-header small{color:#777;font-size:11px}
+.barcode-wrap{text-align:center;margin-top:12px;padding-top:10px;border-top:1.5px dashed #ffd180;overflow-x:auto}
+.barcode-wrap svg{max-width:100%;height:auto}
+
+/* Table Responsive & Admin Tools */
+.table-wrap{overflow-x:auto;border:1px solid #ffe08a;border-radius:12px;margin-top:10px}
+.admin-tools{display:flex;gap:8px;margin-bottom:10px}
+.admin-tools input{margin:0;padding:9px 12px;font-size:13px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.stat-grid div{background:#fff7e6;padding:10px 8px;border-radius:14px;text-align:center;border:1px solid #ffe08a}
+.stat-grid b{font-size:16px;display:block;color:#e65100;margin-top:2px}
+.stat-grid span{font-size:11px;color:#666;font-weight:600}
+.price-breakdown{background:#fffdf5;border:1px solid #ffe08a;border-radius:8px;padding:5px 7px;margin-top:4px;font-size:11px;line-height:1.45}
+
+/* Modal Dialog Kustom Login & Konfirmasi */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9998;animation:fadeIn .2s ease}
+.modal-card{background:#fff;width:100%;max-width:360px;border-radius:20px;padding:22px 20px;box-shadow:0 20px 40px rgba(0,0,0,.28);text-align:center;animation:popUp .22s ease}
+.modal-icon{width:52px;height:52px;margin:0 auto 10px;border-radius:16px;background:#e8f2ff;color:#0b6cff;display:flex;align-items:center;justify-content:center;font-size:24px}
+.modal-card h3{margin:0 0 6px;color:#1e293b;font-size:18px}
+.modal-card p{margin:0 0 14px;color:#64748b;font-size:13px;line-height:1.4}
+.modal-pin-input{text-align:center;font-size:20px;letter-spacing:6px;font-weight:800;border:2px solid #cbd5e1;background:#f8fafc;padding:12px;border-radius:14px;margin:0 0 14px}
+.modal-pin-input:focus{border-color:#0b6cff;background:#fff}
+.modal-actions{display:flex;gap:8px}
+.modal-actions button{margin-top:0;padding:12px;font-size:14px}
+
+/* Styling Riwayat Transaksi Pelanggan */
+.history-item{background:#fffdf5;border:1.5px solid #ffe08a;border-radius:14px;padding:12px;margin-bottom:10px;transition:transform .15s}
+.history-item-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1.5px dashed #ffd180}
+.history-item-detail{font-size:13px;color:#444;line-height:1.45}
+.btn-mini-struk{background:#0b6cff;color:#fff;padding:7px 12px;font-size:12px;border-radius:9px;width:auto;margin-top:8px}
+
+/* Styling Scanner Barcode Admin */
+.scanner-box{background:#f0f9ff;border:2px dashed #0b6cff;border-radius:16px;padding:12px;margin-bottom:14px}
+#reader{width:100%;border-radius:12px;overflow:hidden;background:#111;margin-bottom:10px}
+.scan-manual-row{display:flex;gap:6px;margin-top:8px}
+.scan-manual-row input{margin:0;padding:10px;font-size:13px;background:#fff}
+.scan-manual-row button{width:auto;padding:10px 14px;font-size:13px;border-radius:12px}
+.scan-result-card{background:#fff;border:1.5px solid #00b894;border-radius:12px;padding:12px;margin-top:10px;text-align:left}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popUp{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+</style>
+</head>
+<body>
+
+<!-- Toast Notifikasi -->
+<div id="toastBox" class="toast hidden"></div>
+
+<!-- Modal Dialog Login Admin -->
+<div id="adminModal" class="modal-overlay hidden" onclick="if(event.target===this) tutupModalAdmin()">
+  <div class="modal-card">
+    <div class="modal-icon">🔐</div>
+    <h3>Akses Khusus Admin</h3>
+    <p>Masukkan password untuk mengelola data pesanan PO Mango Sago.</p>
+    <input id="adminPinInput" class="modal-pin-input" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" onkeyup="if(event.key==='Enter') verifikasiAdmin()">
+    <div class="modal-actions">
+      <button type="button" class="btn-back" onclick="tutupModalAdmin()">Batal</button>
+      <button type="button" class="btn-admin" onclick="verifikasiAdmin()">Masuk</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Dialog Konfirmasi Hapus Pesanan -->
+<div id="confirmDeleteModal" class="modal-overlay hidden" onclick="if(event.target===this) tutupModalHapus()">
+  <div class="modal-card">
+    <div class="modal-icon" style="background:#ffe8ea;color:#ff4757">🗑️</div>
+    <h3>Hapus Pesanan?</h3>
+    <p id="confirmDeleteText">Data pesanan yang dihapus tidak dapat dikembalikan.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-back" onclick="tutupModalHapus()">Batal</button>
+      <button type="button" style="background:#ff4757;color:#fff" onclick="eksekusiHapus()">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="top">
+  <!-- Poster dengan Fallback Ilustrasi SVG Tema Mango Sago -->
+  <div class="poster-wrap">
+    <img id="posterImg" src="poster.jpg" alt="Poster Mango Sago" class="poster" onerror="renderFallbackPoster()">
+    <div id="svgPosterFallback">
+      <svg viewBox="0 0 480 280" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="display:block">
+        <defs>
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff8a00"/>
+            <stop offset="55%" stop-color="#ffc107"/>
+            <stop offset="100%" stop-color="#ffe57f"/>
+          </linearGradient>
+          <linearGradient id="cupGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff8e1"/>
+            <stop offset="50%" stop-color="#ffca28"/>
+            <stop offset="100%" stop-color="#ff8f00"/>
+          </linearGradient>
+        </defs>
+        <rect width="480" height="280" fill="url(#bgGrad)"/>
+        <circle cx="55" cy="55" r="38" fill="#ffffff" opacity="0.2"/>
+        <circle cx="430" cy="45" r="50" fill="#ffffff" opacity="0.18"/>
+        <circle cx="410" cy="230" r="42" fill="#ff6f00" opacity="0.2"/>
+        <circle cx="70" cy="235" r="30" fill="#ffffff" opacity="0.25"/>
+        
+        <g transform="translate(175, 38)">
+          <rect x="78" y="0" width="12" height="65" rx="6" transform="rotate(16 78 0)" fill="#ff4757"/>
+          <path d="M18,65 C18,22 112,22 112,65 Z" fill="#ffffff" opacity="0.75" stroke="#ffffff" stroke-width="3"/>
+          <polygon points="16,65 114,65 100,192 30,192" fill="url(#cupGrad)" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M19,78 Q40,92 65,78 T111,78 L113,66 L17,66 Z" fill="#ffffff" opacity="0.92"/>
+          <rect x="34" y="88" width="18" height="18" rx="4" fill="#ff6d00" transform="rotate(-12 34 88)"/>
+          <rect x="62" y="84" width="20" height="20" rx="4" fill="#ff9100" transform="rotate(10 62 84)"/>
+          <rect x="82" y="96" width="16" height="16" rx="4" fill="#ff6d00" transform="rotate(22 82 96)"/>
+          <circle cx="42" cy="135" r="6" fill="#fffde7" opacity="0.85"/>
+          <circle cx="60" cy="148" r="7" fill="#fffde7" opacity="0.9"/>
+          <circle cx="80" cy="138" r="6" fill="#fffde7" opacity="0.85"/>
+          <circle cx="50" cy="168" r="7" fill="#fffde7" opacity="0.9"/>
+          <circle cx="74" cy="166" r="6" fill="#fffde7" opacity="0.85"/>
+          <circle cx="63" cy="124" r="5" fill="#fffde7" opacity="0.8"/>
+          <rect x="32" y="114" width="66" height="24" rx="12" fill="#0b6cff"/>
+          <text x="65" y="130" font-family="Arial, sans-serif" font-size="11" font-weight="900" fill="#ffe066" text-anchor="middle">FRESH MANGO</text>
+        </g>
+
+        <g transform="translate(52, 130) rotate(-18)">
+          <ellipse cx="35" cy="42" rx="30" ry="40" fill="#ff9100" stroke="#fff3e0" stroke-width="3"/>
+          <path d="M35,4 C48,-10 65,-4 56,10 C48,16 38,10 35,4 Z" fill="#00b894"/>
+        </g>
+        <g transform="translate(365, 125) rotate(20)">
+          <ellipse cx="35" cy="42" rx="30" ry="40" fill="#ff6d00" stroke="#fff3e0" stroke-width="3"/>
+          <path d="M35,4 C22,-10 5,-4 14,10 C22,16 32,10 35,4 Z" fill="#00b894"/>
+        </g>
+
+        <rect x="95" y="242" width="290" height="26" rx="13" fill="#ffffff" opacity="0.92"/>
+        <text x="240" y="259" font-family="Arial, sans-serif" font-size="12" font-weight="800" fill="#d63000" text-anchor="middle">🥭 POTONGAN MANGGA ASLI + SAGO CREAMY</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Bagian Hero -->
+  <div class="hero">
+    <span class="badge-po">✦ OPEN PO - KHUSUS PURWAKARTA ✦</span>
+    <h1>MANGO<br><span>SAGO</span></h1>
+    <p>Manis, Segar & Creamy!</p>
+    <div class="price-tag">HANYA Rp 12.000 / Cup 🥭</div>
+    <p style="font-size:12px;color:#555;font-weight:600;margin-bottom:2px">📍 Titik Pengiriman: Gerai Situ Buleud (Sitbul)</p>
+    <p style="font-size:12px;color:#888;font-weight:400;margin-top:2px">WA Order: +62 838-6703-7269</p>
+  </div>
+
+  <!-- 1. MENU UTAMA -->
+  <div id="menu" class="card center">
+    <h3 style="margin:0 0 10px">Mau pesan atau cek admin?</h3>
+    <button class="btn-order" onclick="show('pelanggan')">🛒 PESAN SEKARANG</button>
+    <button class="btn-history" onclick="bukaRiwayatPelanggan()">📜 RIWAYAT TRANSAKSI SAYA</button>
+    <button class="btn-admin" onclick="bukaModalAdmin()">🔐 MASUK ADMIN</button>
+  </div>
+
+  <!-- 1B. RIWAYAT TRANSAKSI PELANGGAN -->
+  <div id="riwayat" class="card hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h3 style="margin:0">📜 Riwayat Transaksi</h3>
+      <span id="jumlahRiwayatBadge" class="badge pending">0 PO</span>
+    </div>
+    <p style="font-size:12px;color:#666;margin-top:0">Daftar pesanan PO yang pernah dibuat dari perangkat ini. Klik <b>Lihat Nota</b> untuk menampilkan barcode atau mengirim ulang ke WhatsApp.</p>
+    <div id="listRiwayatContainer"></div>
+    <button class="btn-back" onclick="show('menu')">← Kembali ke Menu Utama</button>
+  </div>
+
+  <!-- 2. FORM PELANGGAN -->
+  <div id="pelanggan" class="card hidden">
+    <h3 style="margin-top:0">🛒 Form Pesanan - Purwakarta</h3>
+    <label>Nama Pemesan *</label>
+    <input id="nama" placeholder="Contoh: Putri">
+    
+    <label>No. WA *</label>
+    <input id="wa" type="tel" placeholder="08xxxxxxxxxx">
+    
+    <label>Pilih Kecamatan (Purwakarta) *</label>
+    <select id="kecamatan" onchange="hitung()">
+      <option value="">-- Pilih Kecamatan --</option>
+      <option value="Purwakarta">Purwakarta Kota</option>
+      <option value="Babakancikao">Babakancikao</option>
+      <option value="Jatiluhur">Jatiluhur</option>
+      <option value="Sukatani">Sukatani</option>
+      <option value="Campaka">Campaka</option>
+      <option value="Cibatu">Cibatu</option>
+      <option value="Bungursari">Bungursari</option>
+      <option value="Pasawahan">Pasawahan</option>
+      <option value="Pondoksalam">Pondoksalam</option>
+      <option value="Plered">Plered</option>
+      <option value="Darangdan">Darangdan</option>
+      <option value="Bojong">Bojong</option>
+      <option value="Wanayasa">Wanayasa</option>
+      <option value="Kiarapedes">Kiarapedes</option>
+      <option value="Tegalwaru">Tegalwaru</option>
+      <option value="Maniis">Maniis</option>
+      <option value="Sukasari">Sukasari</option>
+    </select>
+    <div class="kec-info" id="ongkirInfo">Pilih kecamatan dulu untuk lihat ongkir dari Gerai Sitbul (Situ Buleud).</div>
+    
+    <label>Alamat Lengkap *</label>
+    <textarea id="alamat" rows="2" placeholder="Jl. Veteran No.12, dekat Alfamart"></textarea>
+    
+    <label>Jumlah Cup (Rp 12.000/cup)</label>
+    <input id="jumlah" type="number" value="1" min="1" oninput="hitung()">
+
+    <!-- Rincian Pembayaran -->
+    <div class="row">
+      <span>Subtotal Produk (<span id="qtyLabel">1</span> cup)</span>
+      <span id="subtotalText">Rp 12.000</span>
+    </div>
+    <div class="row" style="flex-direction:column;align-items:stretch;border-bottom:1px dashed #eee;padding:8px 0">
+      <div style="display:flex;justify-content:space-between">
+        <span>Ongkir Kurir (Dari Sitbul)</span>
+        <b id="ongkirText">Rp 0</b>
+      </div>
+      <div id="diskonOngkirInfo" style="font-size:11px;color:#00b894;margin-top:2px;display:none"></div>
+    </div>
+    <div class="row" style="border-bottom:none;padding-top:12px">
+      <span style="font-weight:800;color:#333">Total Bayar</span>
+      <span class="total" id="totalText">Rp 12.000</span>
+    </div>
+
+    <button class="btn-order" style="margin-top:8px" onclick="buatPesanan()">✅ PROSES & BUAT STRUK PO</button>
+    <button class="btn-back" onclick="show('menu')">← Kembali ke Menu</button>
+  </div>
+
+  <!-- 3. STRUK / NOTA PESANAN -->
+  <div id="struk" class="card hidden">
+    <div class="struk-box">
+      <div class="struk-header">
+        <h4>🧾 NOTA PRE-ORDER</h4>
+        <small>MANGO SAGO - KHUSUS PURWAKARTA</small><br>
+        <span id="strukStatus" class="badge pending" style="margin-top:6px">MENUNGGU KONFIRMASI</span>
+      </div>
+
+      <div class="row"><span>Kode PO</span><b id="sKode" style="color:#0b6cff">-</b></div>
+      <div class="row"><span>Waktu Order</span><span id="sWaktu">-</span></div>
+      <div class="row"><span>Pemesan</span><b id="sNama">-</b></div>
+      <div class="row"><span>No. WhatsApp</span><span id="sWa">-</span></div>
+      <div class="row"><span>Kecamatan</span><b id="sKec">-</b></div>
+      <div class="row" style="flex-direction:column;gap:4px">
+        <span style="color:#666">Alamat Pengiriman:</span>
+        <span id="sAlamat" style="font-weight:600;color:#333">-</span>
+      </div>
+      <div class="row"><span>Jumlah Pesanan</span><b id="sJumlah">-</b></div>
+      <div class="row"><span>Subtotal Produk</span><span id="sSubtotal">-</span></div>
+      <div class="row"><span>Ongkir Kurir</span><span id="sOngkir">-</span></div>
+      <div class="row" style="border-bottom:none;padding-top:10px">
+        <span style="font-weight:800">TOTAL BAYAR</span>
+        <span class="total" id="sTotal">-</span>
+      </div>
+
+      <!-- Barcode Unik -->
+      <div class="barcode-wrap">
+        <svg id="barcode"></svg>
+        <div style="font-size:11px;color:#777;margin-top:2px">Simpan atau screenshot nota ini sebagai bukti PO</div>
+      </div>
+    </div>
+
+    <a id="btnWaLink" class="btn-wa" href="#" target="_blank" rel="noopener noreferrer" onclick="return cekSebelumWa()">📲 KIRIM PESANAN KE WHATSAPP ADMIN</a>
+    <button type="button" class="btn-copy" onclick="salinFormatWa()">📋 SALIN FORMAT PESANAN</button>
+    <button class="btn-back" onclick="show('menu')">🏠 Kembali ke Menu Utama</button>
+  </div>
+
+  <!-- 4. PANEL ADMIN -->
+  <div id="admin" class="card hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0">📊 Dashboard Admin PO</h3>
+      <span class="badge selesai">ADMIN AKTIF</span>
+    </div>
+
+    <!-- Tombol Toggle Scanner Barcode -->
+    <button type="button" id="btnToggleScanner" class="btn-scan" onclick="toggleScannerAdmin()">📷 SCAN BARCODE NOTA PO</button>
+
+    <!-- Panel Scanner Barcode Admin -->
+    <div id="scannerContainer" class="scanner-box hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <b style="color:#0b6cff;font-size:13px">📷 Pemindai Barcode Struk PO</b>
+        <button type="button" onclick="tutupScannerAdmin()" style="width:auto;padding:4px 10px;font-size:11px;background:#ff4757;color:#fff;border-radius:8px">Tutup ✕</button>
+      </div>
+
+      <div id="reader"></div>
+
+      <div style="margin-top:6px">
+        <label style="font-size:12px;color:#0b6cff;display:block;margin-bottom:4px">Atau pilih foto screenshot barcode:</label>
+        <input type="file" id="scanFileInput" accept="image/*" onchange="scanDariFile(event)" style="padding:8px;font-size:12px;background:#fff;margin:0">
+      </div>
+
+      <div class="scan-manual-row">
+        <input id="manualKodeInput" placeholder="Ketik kode PO (misal: MS-...)" onkeyup="if(event.key==='Enter') prosesHasilScan(this.value)">
+        <button type="button" class="btn-admin" style="margin:0" onclick="prosesHasilScan(document.getElementById('manualKodeInput').value)">Cek</button>
+      </div>
+
+      <div id="scanResultBox" class="hidden"></div>
+    </div>
+
+    <!-- Statistik Ringkas (Dipisah Omzet Produk & Total Ongkir) -->
+    <div class="stat-grid">
+      <div>
+        <span>Total Order</span>
+        <b id="statOrder">0</b>
+      </div>
+      <div>
+        <span>Cup Terjual</span>
+        <b id="statCup">0</b>
+      </div>
+      <div>
+        <span>Pendapatan Produk</span>
+        <b id="statProduk" style="color:#00997a">Rp 0</b>
+      </div>
+      <div>
+        <span>Total Ongkir</span>
+        <b id="statOngkir" style="color:#0b6cff">Rp 0</b>
+      </div>
+      <div style="grid-column:span 2;background:#fff1d0;border-color:#ffb347">
+        <span>Total Keseluruhan (Selesai)</span>
+        <b id="statOmzet" style="font-size:17px">Rp 0</b>
+      </div>
+    </div>
+
+    <!-- Filter Pencarian -->
+    <div class="admin-tools">
+      <input id="cariOrder" placeholder="🔍 Cari nama, kode PO, atau kecamatan..." oninput="renderAdmin()">
+    </div>
+
+    <!-- Tabel Daftar Pesanan -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Kode & Pemesan</th>
+            <th>Detail & Total</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tabelPesanan">
+          <tr><td colspan="4" class="center" style="color:#888;padding:16px">Belum ada pesanan masuk.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button class="btn-back" onclick="logoutAdmin()">🔒 Keluar & Kembali ke Menu</button>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// KONFIGURASI UTAMA & DATA ONGKIR DARI SITBUL
+// ==========================================
+const HARGA_CUP = 12000;
+const PIN_ADMIN = "2026";
+const WA_ADMIN = "6283867037269";
+
+const DATA_ONGKIR = {
+  "Purwakarta": { tarif: 5000, ket: "Area Purwakarta Kota & Sekitar (±1-5 km)", jalur: "pusat" },
+  "Babakancikao": { tarif: 7000, ket: "Area Babakancikao (±5-8 km)", jalur: "barat" },
+  "Jatiluhur": { tarif: 8000, ket: "Area Jatiluhur & Waduk (±6-10 km)", jalur: "barat" },
+  "Pasawahan": { tarif: 8000, ket: "Area Pasawahan (±6-10 km)", jalur: "timur_selatan" },
+  "Bungursari": { tarif: 10000, ket: "Area Bungursari / Tol (±8-12 km)", jalur: "utara" },
+  "Pondoksalam": { tarif: 10000, ket: "Area Pondoksalam (±8-12 km)", jalur: "timur_selatan" },
+  "Campaka": { tarif: 11000, ket: "Area Campaka (±10-15 km)", jalur: "utara" },
+  "Sukatani": { tarif: 12000, ket: "Area Sukatani (±12-16 km)", jalur: "timur_selatan" },
+  "Cibatu": { tarif: 13000, ket: "Area Cibatu (±14-18 km)", jalur: "utara" },
+  "Plered": { tarif: 14000, ket: "Area Plered Sentra Keramik (±15-20 km)", jalur: "timur_selatan" },
+  "Darangdan": { tarif: 16000, ket: "Area Darangdan (±18-24 km)", jalur: "timur_selatan" },
+  "Wanayasa": { tarif: 17000, ket: "Area Wanayasa (±18-25 km)", jalur: "timur_selatan" },
+  "Bojong": { tarif: 18000, ket: "Area Bojong (±20-28 km)", jalur: "timur_selatan" },
+  "Kiarapedes": { tarif: 19000, ket: "Area Kiarapedes (±22-30 km)", jalur: "timur_selatan" },
+  "Tegalwaru": { tarif: 20000, ket: "Area Tegalwaru / Panyindangan (±25-32 km)", jalur: "timur_selatan" },
+  "Maniis": { tarif: 22000, ket: "Area Maniis (±28-36 km)", jalur: "barat" },
+  "Sukasari": { tarif: 25000, ket: "Area Sukasari / Seberang Waduk (±30+ km)", jalur: "barat" }
+};
+
+// Pemetaan Rute / Jalur Searah dari Sitbul yang Disatukan agar Saling Memicu Diskon
+const PETA_JALUR = {
+  "barat": ["Babakancikao", "Jatiluhur", "Maniis", "Sukasari"],
+  "timur_selatan": ["Pasawahan", "Pondoksalam", "Sukatani", "Plered", "Darangdan", "Wanayasa", "Bojong", "Kiarapedes", "Tegalwaru"],
+  "utara": ["Bungursari", "Campaka", "Cibatu"],
+  "pusat": ["Purwakarta"]
+};
+
+let pesananAktif = null;
+let targetHapusKode = null;
+let html5QrScanner = null;
+let scannerSedangAktif = false;
+
+// Fungsi Navigasi Antar Panel
+function show(id) {
+  tutupScannerAdmin();
+  ["menu", "pelanggan", "struk", "admin", "riwayat"].forEach(elId => {
+    const el = document.getElementById(elId);
+    if (el) el.classList.add("hidden");
+  });
+  const target = document.getElementById(id);
+  if (target) {
+    target.classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
+// Notifikasi Toast
+function showToast(pesan, tipe = "success") {
+  const box = document.getElementById("toastBox");
+  if (!box) return;
+  box.textContent = pesan;
+  box.className = "toast " + tipe;
+  box.classList.remove("hidden");
+  setTimeout(() => box.classList.add("hidden"), 3000);
+}
+
+function formatRupiah(num) {
+  return "Rp " + Number(num || 0).toLocaleString("id-ID");
+}
+
+function escapeHtml(str) {
+  return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function renderFallbackPoster() {
+  const img = document.getElementById("posterImg");
+  const fallback = document.getElementById("svgPosterFallback");
+  if (img) img.style.display = "none";
+  if (fallback) fallback.classList.remove("hidden");
+}
+
+// LocalStorage Helper
+function ambilSemuaPesanan() {
+  try {
+    return JSON.parse(localStorage.getItem("po_mangosago_purwakarta") || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function simpanSemuaPesanan(data) {
+  try {
+    localStorage.setItem("po_mangosago_purwakarta", JSON.stringify(data));
+  } catch (e) {
+    console.error("Gagal menyimpan ke storage", e);
+  }
+}
+
+// ==========================================
+// KALKULASI HARGA & DISKON JALUR SEARAH (RUTE)
+// ==========================================
+function hitungDiskonOngkir(kecamatan, ongkirDasar) {
+  if (!kecamatan || !DATA_ONGKIR[kecamatan]) return { ongkirAkhir: ongkirDasar, diskon: 0, info: "" };
+
+  const semuaPesanan = ambilSemuaPesanan();
   
+  // 1. Cek jumlah pesanan di kecamatan yang sama
+  const pesananKecamatanSama = semuaPesanan.filter(item => 
+    item.kecamatan && item.kecamatan.toLowerCase() === kecamatan.toLowerCase()
+  );
+  let totalDiKecamatan = pesananKecamatanSama.length + 1;
+
+  // 2. Cek pesanan di jalur rute searah yang sama dari Sitbul
+  const jalurAktif = DATA_ONGKIR[kecamatan].jalur;
+  const daftarKecamatanDiJalur = PETA_JALUR[jalurAktif] || [kecamatan];
+  
+  const pesananDiJalurSearah = semuaPesanan.filter(item => {
+    return item.kecamatan && daftarKecamatanDiJalur.includes(item.kecamatan);
+  });
+  let totalDiJalur = pesananDiJalurSearah.length + 1;
+
+  let diskon = 0;
+  let infoDiskon = "";
+
+  // Logika Diskon Berjenjang Berdasarkan Jalur Searah / Rute Kurir
+  if (totalDiJalur >= 8 || totalDiKecamatan >= 5) {
+    diskon = Math.min(ongkirDasar, 7000);
+    infoDiskon = `🚚 PROMO JALUR SEARAH! Ada ${totalDiJalur} pengiriman di Rute ${jalurAktif.toUpperCase()} (Melewati arahmu). Ongkir dipotong Rp ${diskon.toLocaleString("id-ID")}!`;
+  } else if (totalDiJalur >= 4 || totalDiKecamatan >= 3) {
+    diskon = Math.min(ongkirDasar, 4000);
+    infoDiskon = `✨ EFISIENSI RUTE! Ada ${totalDiJalur} pesanan searah di Jalur ${jalurAktif.toUpperCase()}. Ongkir hemat Rp ${diskon.toLocaleString("id-ID")}!`;
+  } else if (totalDiKecamatan >= 2) {
+    diskon = Math.min(ongkirDasar, 2500);
+    infoDiskon = `🌟 Ada ${totalDiKecamatan} pesanan di Kec. ${kecamatan}. Ongkir dipotong Rp ${diskon.toLocaleString("id-ID")}`;
+  }
+
+  const ongkirAkhir = Math.max(0, ongkirDasar - diskon);
+  return { ongkirAkhir, diskon, info: infoDiskon };
+}
+
+function hitung() {
+  const kec = document.getElementById("kecamatan").value;
+  const qtyInput = document.getElementById("jumlah");
+  let qty = parseInt(qtyInput.value, 10);
+  if (isNaN(qty) || qty < 1) qty = 1;
+
+  const infoEl = document.getElementById("ongkirInfo");
+  const diskonInfoEl = document.getElementById("diskonOngkirInfo");
+  let ongkirDasar = 0;
+
+  if (kec && DATA_ONGKIR[kec]) {
+    ongkirDasar = DATA_ONGKIR[kec].tarif;
+    const hasilDiskon = hitungDiskonOngkir(kec, ongkirDasar);
+    let ongkirFinal = hasilDiskon.ongkirAkhir;
+
+    infoEl.innerHTML = `📍 <b>Sitbul → Kec. ${kec}</b>: Tarif Dasar <b>${formatRupiah(ongkirDasar)}</b><br><span style="color:#444">${DATA_ONGKIR[kec].ket}</span>`;
+    
+    if (hasilDiskon.diskon > 0) {
+      diskonInfoEl.style.display = "block";
+      diskonInfoEl.textContent = hasilDiskon.info;
+      document.getElementById("ongkirText").innerHTML = `<span style="text-decoration:line-through;color:#888;font-size:12px;margin-right:6px">${formatRupiah(ongkirDasar)}</span><span style="color:#00b894">${formatRupiah(ongkirFinal)}</span>`;
+    } else {
+      diskonInfoEl.style.display = "none";
+      document.getElementById("ongkirText").textContent = formatRupiah(ongkirDasar);
+    }
+
+    const subtotal = qty * HARGA_CUP;
+    const total = subtotal + ongkirFinal;
+
+    document.getElementById("qtyLabel").textContent = qty;
+    document.getElementById("subtotalText").textContent = formatRupiah(subtotal);
+    document.getElementById("totalText").textContent = formatRupiah(total);
+
+    return { kec, qty, subtotal, ongkir: ongkirFinal, total };
+  } else {
+    infoEl.textContent = "Pilih kecamatan dulu untuk lihat ongkir dari Gerai Sitbul (Situ Buleud).";
+    diskonInfoEl.style.display = "none";
+    document.getElementById("ongkirText").textContent = formatRupiah(0);
+    
+    const subtotal = qty * HARGA_CUP;
+    document.getElementById("qtyLabel").textContent = qty;
+    document.getElementById("subtotalText").textContent = formatRupiah(subtotal);
+    document.getElementById("totalText").textContent = formatRupiah(subtotal);
+
+    return { kec, qty, subtotal, ongkir: 0, total: subtotal };
+  }
+}
+
+// ==========================================
+// BUAT PESANAN & STRUK BARCODE
+// ==========================================
+function buatPesanan() {
+  const nama = document.getElementById("nama").value.trim();
+  const wa = document.getElementById("wa").value.trim();
+  const alamat = document.getElementById("alamat").value.trim();
+  const { kec, qty, subtotal, ongkir, total } = hitung();
+
+  if (!nama) {
+    showToast("Nama pemesan wajib diisi!", "error");
+    document.getElementById("nama").focus();
+    return;
+  }
+  if (!wa || wa.replace(/\D/g, "").length < 9) {
+    showToast("Nomor WhatsApp tidak valid!", "error");
+    document.getElementById("wa").focus();
+    return;
+  }
+  if (!kec) {
+    showToast("Silakan pilih kecamatan di Purwakarta!", "error");
+    document.getElementById("kecamatan").focus();
+    return;
+  }
+  if (!alamat) {
+    showToast("Alamat lengkap wajib diisi agar kurir mudah mengantar!", "error");
+    document.getElementById("alamat").focus();
+    return;
+  }
+
+  const now = new Date();
+  const acak = Math.floor(1000 + Math.random() * 9000);
+  const kodePO = "MS-" + String(now.getHours()).padStart(2, "0") + String(now.getMinutes()).padStart(2, "0") + "-" + acak;
+  const waktuStr = now.toLocaleDateString("id-ID", {
+    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+  }) + " WIB";
+
+  const dataOrder = {
+    kode: kodePO,
+    waktu: waktuStr,
+    nama,
+    wa,
+    kecamatan: kec,
+    alamat,
+    jumlah: qty,
+    subtotal,
+    ongkir,
+    total,
+    status: "pending"
+  };
+
+  const daftar = ambilSemuaPesanan();
+  daftar.unshift(dataOrder);
+  simpanSemuaPesanan(daftar);
+
+  tampilkanStruk(dataOrder);
+  showToast("Pesanan PO berhasil dibuat!", "success");
+}
+
+function tampilkanStruk(order) {
+  pesananAktif = order;
+  document.getElementById("sKode").textContent = order.kode;
+  document.getElementById("sWaktu").textContent = order.waktu;
+  document.getElementById("sNama").textContent = order.nama;
+  document.getElementById("sWa").textContent = order.wa;
+  document.getElementById("sKec").textContent = order.kecamatan + ", Purwakarta";
+  document.getElementById("sAlamat").textContent = order.alamat;
+  document.getElementById("sJumlah").textContent = order.jumlah + " Cup (@ Rp 12.000)";
+  document.getElementById("sSubtotal").textContent = formatRupiah(order.subtotal);
+  document.getElementById("sOngkir").textContent = formatRupiah(order.ongkir);
+  document.getElementById("sTotal").textContent = formatRupiah(order.total);
+
+  const badgeEl = document.getElementById("strukStatus");
+  if (badgeEl) {
+    badgeEl.className = "badge " + (order.status === "selesai" ? "selesai" : "pending");
+    badgeEl.textContent = order.status === "selesai" ? "SELESAI / TERKIRIM" : "MENUNGGU KONFIRMASI";
+  }
+
+  try {
+    if (typeof JsBarcode !== "undefined") {
+      JsBarcode("#barcode", order.kode, {
+        format: "CODE128",
+        lineColor: "#2d3436",
+        width: 2,
+        height: 48,
+        displayValue: true,
+        fontSize: 13,
+        margin: 6,
+        background: "#fffdf5"
+      });
+    }
+  } catch (err) {
+    console.warn("Barcode tidak dapat dirender:", err);
+  }
+
+  const linkWa = document.getElementById("btnWaLink");
+  if (linkWa) {
+    linkWa.href = buatUrlWhatsApp(order);
+  }
+
+  show("struk");
+}
+
+function susunTeksPesanWa(o) {
+  return (
+    `*HALO ADMIN MANGO SAGO PURWAKARTA!* 🥭\n` +
+    `Saya mau konfirmasi pesanan PO berikut:\n\n` +
+    `• *Kode PO:* ${o.kode}\n` +
+    `• *Nama:* ${o.nama}\n` +
+    `• *No. WA:* ${o.wa}\n` +
+    `• *Kecamatan:* ${o.kecamatan}\n` +
+    `• *Alamat:* ${o.alamat}\n` +
+    `• *Jumlah:* ${o.jumlah} Cup\n` +
+    `• *Subtotal:* ${formatRupiah(o.subtotal)}\n` +
+    `• *Ongkir (Dari Sitbul):* ${formatRupiah(o.ongkir)}\n` +
+    `• *TOTAL BAYAR:* *${formatRupiah(o.total)}*\n\n` +
+    `Mohon diproses ya Kak, terima kasih! 🙏`
+  );
+}
+
+function buatUrlWhatsApp(o) {
+  const teksPesan = susunTeksPesanWa(o);
+  return `https://api.whatsapp.com/send?phone=${WA_ADMIN}&text=${encodeURIComponent(teksPesan)}`;
+}
+
+function cekSebelumWa() {
+  if (!pesananAktif) {
+    showToast("Data pesanan belum tersedia.", "error");
+    return false;
+  }
+  showToast("Membuka WhatsApp ke Admin (+62 838-6703-7269)...", "success");
+  return true;
+}
+
+function salinFormatWa() {
+  if (!pesananAktif) return;
+  const teks = susunTeksPesanWa(pesananAktif);
+  const textarea = document.createElement("textarea");
+  textarea.value = teks;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  textarea.setSelectionRange(0, 99999);
+  try {
+    document.execCommand("copy");
+    showToast("Format pesanan disalin! Tempel ke WA 0838-6703-7269.", "success");
+  } catch (err) {
+    showToast("Gagal menyalin teks pesanan.", "error");
+  }
+  document.body.removeChild(textarea);
+}
+
+// ==========================================
+// RIWAYAT TRANSAKSI PELANGGAN
+// ==========================================
+function bukaRiwayatPelanggan() {
+  renderRiwayatPelanggan();
+  show("riwayat");
+}
+
+function renderRiwayatPelanggan() {
+  const daftar = ambilSemuaPesanan();
+  const container = document.getElementById("listRiwayatContainer");
+  const badge = document.getElementById("jumlahRiwayatBadge");
+
+  badge.textContent = daftar.length + " PO";
+  badge.className = daftar.length > 0 ? "badge selesai" : "badge pending";
+
+  if (daftar.length === 0) {
+    container.innerHTML = `
+      <div class="center" style="padding:20px 10px;color:#777">
+        <div style="font-size:32px;margin-bottom:6px">🥭</div>
+        <b>Belum ada riwayat transaksi.</b><br>
+        <span style="font-size:12px">Silakan buat pesanan PO pertama Anda sekarang!</span>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = daftar.map(item => {
+    const statusBadge = item.status === "selesai"
+      ? `<span class="badge selesai">Selesai</span>`
+      : `<span class="badge pending">Pending</span>`;
+
+    return `
+      <div class="history-item">
+        <div class="history-item-top">
+          <div>
+            <b style="color:#0b6cff;font-size:13px">${escapeHtml(item.kode)}</b>
+            <div style="font-size:11px;color:#888">${escapeHtml(item.waktu)}</div>
+          </div>
+          ${statusBadge}
+        </div>
+        <div class="history-item-detail">
+          <b>${escapeHtml(item.nama)}</b> • ${item.jumlah} Cup<br>
+          <span style="color:#666;font-size:12px">Kec. ${escapeHtml(item.kecamatan)} — ${escapeHtml(item.alamat)}</span><br>
+          <span style="color:#e65100;font-weight:800">Total: ${formatRupiah(item.total)}</span>
+        </div>
+        <button type="button" class="btn-mini-struk" onclick="bukaNotaDariRiwayat('${escapeHtml(item.kode)}')">🧾 Lihat Nota & Barcode</button>
+      </div>
+    `;
+  }).join("");
+}
+
+function bukaNotaDariRiwayat(kode) {
+  const daftar = ambilSemuaPesanan();
+  const ditemukan = daftar.find(x => x.kode === kode);
+  if (!ditemukan) {
+    showToast("Data nota tidak ditemukan.", "error");
+    return;
+  }
+  tampilkanStruk(ditemukan);
+}
+
+// ==========================================
+// PANEL ADMIN & SCANNER BARCODE
+// ==========================================
+function bukaModalAdmin() {
+  const modal = document.getElementById("adminModal");
+  const input = document.getElementById("adminPinInput");
+  input.value = "";
+  modal.classList.remove("hidden");
+  setTimeout(() => input.focus(), 80);
+}
+
+function tutupModalAdmin() {
+  document.getElementById("adminModal").classList.add("hidden");
+  document.getElementById("adminPinInput").value = "";
+}
+
+function verifikasiAdmin() {
+  const pinInput = document.getElementById("adminPinInput").value.trim();
+  if (pinInput === PIN_ADMIN) {
+    tutupModalAdmin();
+    renderAdmin();
+    show("admin");
+    showToast("Selamat datang, Admin!", "success");
+  } else {
+    showToast("Password salah! Akses ditolak.", "error");
+    const input = document.getElementById("adminPinInput");
+    input.value = "";
+    input.focus();
+  }
+}
+
+function logoutAdmin() {
+  tutupScannerAdmin();
+  show("menu");
+}
+
+function toggleScannerAdmin() {
+  const box = document.getElementById("scannerContainer");
+  if (box.classList.contains("hidden")) {
+    box.classList.remove("hidden");
+    document.getElementById("scanResultBox").classList.add("hidden");
+    document.getElementById("manualKodeInput").value = "";
+    mulaiKameraScanner();
+  } else {
+    tutupScannerAdmin();
+  }
+}
+
+function mulaiKameraScanner() {
+  if (typeof Html5Qrcode === "undefined") {
+    showToast("Fitur kamera tidak tersedia, gunakan upload foto atau ketik kode.", "error");
+    return;
+  }
+
+  try {
+    if (!html5QrScanner) {
+      html5QrScanner = new Html5Qrcode("reader");
+    }
+    if (scannerSedangAktif) return;
+
+    html5QrScanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 240, height: 110 } },
+      (decodedText) => {
+        prosesHasilScan(decodedText);
+      },
+      () => {}
+    ).then(() => {
+      scannerSedangAktif = true;
+    }).catch(() => {
+      document.getElementById("reader").innerHTML = `
+        <div style="padding:14px;color:#fff;font-size:12px;text-align:center">
+          📷 Kamera tidak dapat diakses langsung.<br>Silakan pilih foto struk barcode atau ketik kode PO di bawah.
+        </div>
+      `;
+    });
+  } catch (e) {
+    console.warn("Gagal inisialisasi kamera:", e);
+  }
+}
+
+function tutupScannerAdmin() {
+  const box = document.getElementById("scannerContainer");
+  if (box) box.classList.add("hidden");
+
+  if (html5QrScanner && scannerSedangAktif) {
+    html5QrScanner.stop().then(() => {
+      scannerSedangAktif = false;
+    }).catch(() => {
+      scannerSedangAktif = false;
+    });
+  }
+}
+
+function scanDariFile(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  if (typeof Html5Qrcode === "undefined") {
+    showToast("Library pemindai gambar belum siap.", "error");
+    return;
+  }
+
+  const prosesFile = () => {
+    if (!html5QrScanner) {
+      html5QrScanner = new Html5Qrcode("reader");
+    }
+    html5QrScanner.scanFile(file, true)
+      .then(decodedText => {
+        prosesHasilScan(decodedText);
+        event.target.value = "";
+      })
+      .catch(() => {
+        showToast("Barcode tidak terbaca dari foto. Pastikan gambar jelas atau ketik kode PO.", "error");
+        event.target.value = "";
+      });
+  };
+
+  if (scannerSedangAktif && html5QrScanner) {
+    html5QrScanner.stop().then(() => {
+      scannerSedangAktif = false;
+      prosesFile();
+    }).catch(() => {
+      scannerSedangAktif = false;
+      prosesFile();
+    });
+  } else {
+    prosesFile();
+  }
+}
+
+function prosesHasilScan(kodeRaw) {
+  const kodeBersih = String(kodeRaw || "").trim().toUpperCase();
+  const resultBox = document.getElementById("scanResultBox");
+
+  if (!kodeBersih) {
+    showToast("Masukkan atau pindai kode PO terlebih dahulu.", "error");
+    return;
+  }
+
+  const daftar = ambilSemuaPesanan();
+  const order = daftar.find(x => x.kode.toUpperCase() === kodeBersih);
+
+  resultBox.classList.remove("hidden");
+
+  if (!order) {
+    resultBox.innerHTML = `
+      <div class="scan-result-card" style="border-color:#ff4757;background:#fff5f5">
+        <b style="color:#ff4757">❌ Kode PO Tidak Ditemukan</b>
+        <div style="font-size:12px;color:#555;margin-top:4px">Kode <b>${escapeHtml(kodeBersih)}</b> tidak terdaftar di sistem.</div>
+      </div>
+    `;
+    showToast("Kode PO tidak ditemukan!", "error");
+    return;
+  }
+
+  const subProduk = Number(order.subtotal || (order.jumlah * HARGA_CUP));
+  const biayaOngkir = Number(order.ongkir || 0);
+  const tombolSelesai = order.status === "pending"
+    ? `<button type="button" class="btn-done" style="width:100%;padding:10px;font-size:13px;margin-top:8px" onclick="konfirmasiDariScan('${escapeHtml(order.kode)}')">✅ TANDAI PESANAN SELESAI</button>`
+    : `<div style="margin-top:8px;color:#00b894;font-weight:800;font-size:12px">✔ Pesanan ini sudah berstatus SELESAI.</div>`;
+
+  resultBox.innerHTML = `
+    <div class="scan-result-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b style="color:#0b6cff;font-size:14px">✅ Nota Valid: ${escapeHtml(order.kode)}</b>
+        <span class="badge ${order.status === "selesai" ? "selesai" : "pending"}">${order.status === "selesai" ? "Selesai" : "Pending"}</span>
+      </div>
+      <div style="font-size:12px;color:#333;margin-top:6px;line-height:1.5">
+        <b>Pemesan:</b> ${escapeHtml(order.nama)} (${escapeHtml(order.wa)})<br>
+        <b>Pesanan:</b> ${order.jumlah} Cup • Kec. ${escapeHtml(order.kecamatan)}<br>
+        <b>Alamat:</b> ${escapeHtml(order.alamat)}<br>
+        <div class="price-breakdown" style="margin-top:6px">
+          • Harga Produk: <b style="color:#00997a">${formatRupiah(subProduk)}</b><br>
+          • Harga Ongkir: <b style="color:#0b6cff">${formatRupiah(biayaOngkir)}</b><br>
+          • Total Bayar: <b style="color:#e65100">${formatRupiah(order.total)}</b>
+        </div>
+      </div>
+      ${tombolSelesai}
+    </div>
+  `;
+  showToast("Barcode PO valid ditemukan!", "success");
+}
+
+function konfirmasiDariScan(kode) {
+  tandaiSelesai(kode);
+  prosesHasilScan(kode);
+}
+
+function renderAdmin() {
+  const semua = ambilSemuaPesanan();
+  const keyword = (document.getElementById("cariOrder").value || "").toLowerCase().trim();
+
+  let totalCup = 0;
+  let totalProduk = 0;
+  let totalOngkir = 0;
+  let totalOmzet = 0;
+  let totalSelesai = 0;
+
+  semua.forEach(item => {
+    if (item.status === "selesai") {
+      const sub = Number(item.subtotal || (Number(item.jumlah || 0) * HARGA_CUP));
+      const ong = Number(item.ongkir || 0);
+      totalCup += Number(item.jumlah || 0);
+      totalProduk += sub;
+      totalOngkir += ong;
+      totalOmzet += Number(item.total || (sub + ong));
+      totalSelesai++;
+    }
+  });
+
+  document.getElementById("statOrder").textContent = semua.length + " (" + totalSelesai + " Selesai)";
+  document.getElementById("statCup").textContent = totalCup;
+  document.getElementById("statProduk").textContent = formatRupiah(totalProduk);
+  document.getElementById("statOngkir").textContent = formatRupiah(totalOngkir);
+  document.getElementById("statOmzet").textContent = formatRupiah(totalOmzet);
+
+  const tersaring = semua.filter(item => {
+    if (!keyword) return true;
+    return (
+      item.kode.toLowerCase().includes(keyword) ||
+      item.nama.toLowerCase().includes(keyword) ||
+      item.kecamatan.toLowerCase().includes(keyword) ||
+      item.wa.toLowerCase().includes(keyword)
+    );
+  });
+
+  const tbody = document.getElementById("tabelPesanan");
+  if (tersaring.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="center" style="color:#888;padding:16px">Tidak ada data pesanan yang cocok.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = tersaring.map(item => {
+    const statusBadge = item.status === "selesai"
+      ? `<span class="badge selesai">Selesai</span>`
+      : `<span class="badge pending">Pending</span>`;
+
+    const subP = Number(item.subtotal || (item.jumlah * HARGA_CUP));
+    const ongK = Number(item.ongkir || 0);
+
+    const btnAksi = item.status === "pending"
+      ? `<button type="button" class="btn-done" onclick="tandaiSelesai('${escapeHtml(item.kode)}')">Selesai</button>`
+      : `<button type="button" class="btn-back" style="padding:6px 10px;font-size:11px;margin:0" onclick="tandaiPending('${escapeHtml(item.kode)}')">Batalkan</button>`;
+
+    return `
+      <tr>
+        <td>
+          <b style="color:#0b6cff">${escapeHtml(item.kode)}</b><br>
+          <b>${escapeHtml(item.nama)}</b><br>
+          <span style="color:#666">${escapeHtml(item.wa)}</span>
+        </td>
+        <td>
+          <b>${item.jumlah} Cup</b> • ${escapeHtml(item.kecamatan)}<br>
+          <div class="price-breakdown">
+            Prod: ${formatRupiah(subP)}<br>
+            Ongkir: ${formatRupiah(ongK)}<br>
+            <b>Tot: ${formatRupiah(item.total)}</b>
+          </div>
+          <span style="color:#555;font-size:11px">${escapeHtml(item.waktu)}</span>
+        </td>
+        <td>${statusBadge}</td>
+        <td>
+          ${btnAksi}
+          <button type="button" class="btn-del" onclick="mintaHapus('${escapeHtml(item.kode)}')">Hapus</button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function tandaiSelesai(kode) {
+  const daftar = ambilSemuaPesanan();
+  const idx = daftar.findIndex(x => x.kode === kode);
+  if (idx !== -1) {
+    daftar[idx].status = "selesai";
+    simpanSemuaPesanan(daftar);
+    renderAdmin();
+    showToast("Pesanan ditandai Selesai (Pendapatan direkap).", "success");
+  }
+}
+
+function tandaiPending(kode) {
+  const daftar = ambilSemuaPesanan();
+  const idx = daftar.findIndex(x => x.kode === kode);
+  if (idx !== -1) {
+    daftar[idx].status = "pending";
+    simpanSemuaPesanan(daftar);
+    renderAdmin();
+    showToast("Pesanan dikembalikan ke status Pending.", "success");
+  }
+}
+
+function mintaHapus(kode) {
+  targetHapusKode = kode;
+  document.getElementById("confirmDeleteText").innerHTML = `Hapus data pesanan <b>${escapeHtml(kode)}</b> dari sistem?`;
+  document.getElementById("confirmDeleteModal").classList.remove("hidden");
+}
+
+function tutupModalHapus() {
+  targetHapusKode = null;
+  document.getElementById("confirmDeleteModal").classList.add("hidden");
+}
+
+function eksekusiHapus() {
+  if (!targetHapusKode) return;
+  let daftar = ambilSemuaPesanan();
+  daftar = daftar.filter(x => x.kode !== targetHapusKode);
+  simpanSemuaPesanan(daftar);
+  tutupModalHapus();
+  renderAdmin();
+  showToast("Pesanan berhasil dihapus.", "success");
+}
+</script>
+</body>
+</html>
